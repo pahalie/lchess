@@ -15,11 +15,26 @@ class State(object):
 		for i in range(64):
 			pp = self.board.piece_at(i)
 			if pp:
-				print(pp)
-				pass
-		#import pdb;pdb.set_trace()
+				bstate[i] = {'P':1, 'N':2, 'B':3, 'R':4, 'Q':5, 'K':6, \
+                                             'p':9, 'n':10, 'b':11, 'r':12, 'q':13, 'k':14}[pp.symbol()]
+
+		if self.board.has_queenside_castling_rights(chess.WHITE):
+			assert bstate[0] == 4
+			bstate[0] = 7
+		if self.board.has_kingside_castling_rights(chess.WHITE):
+			assert bstate[7] == 4
+			bstate[7] = 7
+		if self.board.has_queenside_castling_rights(chess.BLACK):
+			assert bstate[56] == 12
+			bstate[0] = 15
+		if self.board.has_kingside_castling_rights(chess.BLACK):
+			assert bstate[63] == 12
+			bstate[0] = 15
+
+		if self.board.ep_square:
+			assert bstate[self.board.ep_square] == 0
+			bstate[self.board.ep_square] = 8
 		bstate = bstate.reshape(8,8)
-		#exit(0)
 
 		state = np.zeros((8,8,5), np.uint8)
 
@@ -30,9 +45,6 @@ class State(object):
 
 
 		state[:,:,4] = (self.board.turn*1.0)
-		import pdb;pdb.set_trace()
-		#print(state)
-		#exit(0)
 		return state
 
 
